@@ -75,7 +75,9 @@
 		 
 
 			// Setup renderers
-			const renderers = [new THREE.WebGLRenderer(), new THREE.CSS2DRenderer()]
+			const renderer2 = new THREE.WebGLRenderer({ alpha: true });
+			renderer2.setClearColor( 0xFFFFFF, 0 );
+			const renderers = [renderer2,  new THREE.CSS2DRenderer()]
 			renderers.forEach((r, idx) => {
 				r.setSize(window.innerWidth, window.innerHeight)
 
@@ -106,6 +108,7 @@
 			scene.add(new THREE.AmbientLight(0xffffff, 1))
 			scene.add(directionalLight1)
 			scene.add(directionalLight2)
+		 
 
 			// Setup camera
 			const camera = new THREE.PerspectiveCamera()
