@@ -45,17 +45,18 @@
 				startLng: (Math.random() - 0.5) * 360,
 				endLat: (Math.random() - 0.5) * 180,
 				endLng: (Math.random() - 0.5) * 360,
-				color: ["red", "white", "blue", "green"][Math.round(Math.random() * 3)],
+				color: "#ee761e",
 			}))
 
 			const Globe = new ThreeGlobe()
-				.globeImageUrl("//unpkg.com/three-globe/example/img/earth-day.jpg")
-				.bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
+				.globeImageUrl("/2k_earth_particles_map.webp")
+				// .bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
+				.atmosphereAltitude(0.3)
 				.htmlElementsData(gData)
 				.htmlElement((d) => {
 					const el = document.createElement("div")
 					el.innerHTML = markerSvg
-					el.style.color = d.color
+					el.style.color = "#ee761e"
 					el.style.width = `${d.size}px`
 					return el
 				})
@@ -66,10 +67,13 @@
 				.arcDashInitialGap(() => Math.random() * 5)
 				.arcDashAnimateTime(1000)
 
+		 
+
 			// Setup renderers
 			const renderers = [new THREE.WebGLRenderer(), new THREE.CSS2DRenderer()]
 			renderers.forEach((r, idx) => {
 				r.setSize(window.innerWidth, window.innerHeight)
+
 				if (idx > 0) {
 					// overlay additional on top of main renderer
 					r.domElement.style.position = "absolute"
@@ -79,17 +83,30 @@
 				document.getElementById("globeViz").appendChild(r.domElement)
 			})
 
+			const directionalLight1 = new THREE.DirectionalLight(
+				0xffffff,
+				0.6 * Math.PI
+			)
+			directionalLight1.position.set(1, 1, 1)
+
+			const directionalLight2 = new THREE.DirectionalLight(
+				0xffffff,
+				0.6 * Math.PI
+			)
+			directionalLight2.position.set(-1, 0, -1)
+
 			// Setup scene
 			const scene = new THREE.Scene()
 			scene.add(Globe)
-			scene.add(new THREE.AmbientLight(0xcccccc))
-			scene.add(new THREE.DirectionalLight(0xffffff, 0.6))
+			scene.add(new THREE.AmbientLight(0xffffff, 1))
+			scene.add(directionalLight1)
+			scene.add(directionalLight2)
 
 			// Setup camera
 			const camera = new THREE.PerspectiveCamera()
 			camera.aspect = window.innerWidth / window.innerHeight
 			camera.updateProjectionMatrix()
-			camera.position.z = 300
+			camera.position.z = 400
 
 			// Add camera controls
 			const tbControls = new THREE.TrackballControls(
@@ -97,14 +114,24 @@
 				renderers[0].domElement
 			)
 			tbControls.minDistance = 101
-			tbControls.rotateSpeed = 5
+			tbControls.rotateSpeed = 0.7
 			tbControls.zoomSpeed = 0.8
+			tbControls.mouseButtons = { LEFT: 0 }
+			tbControls.noZoom = true
 
 			// Update pov when camera moves
 			Globe.setPointOfView(camera.position, Globe.position)
-			tbControls.addEventListener("change", () =>
+			tbControls.addEventListener("change", () => {
 				Globe.setPointOfView(camera.position, Globe.position)
-			)
+			})
+
+			window.addEventListener("resize", function () {
+				camera.aspect = window.innerWidth / window.innerHeight
+				camera.updateProjectionMatrix()
+				renderers.forEach((r, idx) => {
+					r.setSize(window.innerWidth, window.innerHeight)
+				})
+			})
 
 			// Kick-off renderers
 			;(function animate() {
