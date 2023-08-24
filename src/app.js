@@ -101,6 +101,8 @@ function createGlob3D(globe) {
 	tbControls.zoomSpeed = 0.8
 	tbControls.mouseButtons = { LEFT: 0 }
 	tbControls.noZoom = true
+	tbControls.animationX = true
+	tbControls.animationXSpeed = 0.003;
 
 	// Update pov when camera moves
 	Globe.setPointOfView(camera.position, Globe.position)
@@ -114,13 +116,13 @@ function createGlob3D(globe) {
 		renderers.forEach((r, idx) => {
 			r.setSize(window.innerWidth, window.innerHeight)
 		})
-	})
-
+	})	
+		
 	// Kick-off renderers
 	;(function animate() {
 		// IIFE
 		// Frame cycle
-		tbControls.update(false)
+		tbControls.update(false);
 		renderers.forEach((r) => r.render(scene, camera))
 		requestAnimationFrame(animate)
 	})()

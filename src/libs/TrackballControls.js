@@ -33,6 +33,9 @@ class TrackballControls extends EventDispatcher {
 
 		this.enabled = true
 
+		this.animationX = false
+		this.animationXSpeed = 0.003
+
 		this.screen = { left: 0, top: 0, width: 0, height: 0 }
 
 		this.rotateSpeed = 1.0
@@ -59,6 +62,9 @@ class TrackballControls extends EventDispatcher {
 			MIDDLE: MOUSE.DOLLY,
 			RIGHT: MOUSE.PAN,
 		}
+
+		let isMoving = false
+		let isUp = true
 
 		// internals
 
@@ -153,6 +159,10 @@ class TrackballControls extends EventDispatcher {
 				}
 				let angle = moveDirection.length()
 
+				if (scope.animationX && !isMoving) {
+					angle = scope.animationXSpeed
+				}
+
 				if (angle) {
 					_eye.copy(scope.object.position).sub(scope.target)
 
@@ -167,7 +177,14 @@ class TrackballControls extends EventDispatcher {
 					} else {
 						objectUpDirection.setLength(0)
 					}
-					objectSidewaysDirection.setLength(_moveCurr.x - _movePrev.x)
+
+					if (isMoving) {
+						objectSidewaysDirection.setLength(_moveCurr.x - _movePrev.x)
+					}
+
+					if (scope.animationX && !isMoving) {
+						objectSidewaysDirection.setLength(0.1)
+					}
 
 					moveDirection.copy(objectUpDirection.add(objectSidewaysDirection))
 
@@ -309,11 +326,11 @@ class TrackballControls extends EventDispatcher {
 			}
 		}
 
-		this.update = function (yaxis = true) {
+		this.update = function (yaxis = true, moveAngle = false) {
 			_eye.subVectors(scope.object.position, scope.target)
 
 			if (!scope.noRotate) {
-				scope.rotateCamera(yaxis)
+				scope.rotateCamera(yaxis, moveAngle)
 			}
 
 			if (!scope.noZoom) {
@@ -400,6 +417,9 @@ class TrackballControls extends EventDispatcher {
 		function onPointerMove(event) {
 			if (scope.enabled === false) return
 
+			isMoving = true
+			isUp = false
+
 			if (event.pointerType === "touch") {
 				onTouchMove(event)
 			} else {
@@ -409,6 +429,9 @@ class TrackballControls extends EventDispatcher {
 
 		function onPointerUp(event) {
 			if (scope.enabled === false) return
+
+			isUp = true
+			isMoving = false
 
 			if (event.pointerType === "touch") {
 				onTouchEnd(event)
