@@ -1,0 +1,22 @@
+{
+  "name": "basic",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/index.html",
+  "private": true,
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "keywords": [],
+  "author": "n3ztho",
+  "license": "ISC",
+  "dependencies": {
+    "three": "0.155.0",
+    "three-globe": "2.28.0"
+  },
+  "devDependencies": {
+    "parcel": "2.9.3",
+    "parcel-plugin-static-files-copy": "2.6.0"
+  }
+}
